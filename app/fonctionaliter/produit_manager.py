@@ -30,4 +30,4 @@ def tri_rapide(liste):
 
 # fonction de recherche de un produit dans la liste
 def searche():
-    pass
+    

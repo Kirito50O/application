@@ -1,17 +1,26 @@
-from app.users.auth import *
+from app.users.auth import  Gestionnaireutilisateur
 # pour l'instent code qui vat faire l'interaction entre l'utilisateur et les difféerent programe
+gestionnaire = Gestionnaireutilisateur()
 def main():
-    gestionnaire = Gestionnaireutilisateur()
-    #affichage d'un menue dans le terminal 
-    print("-------------veiller vous connectée-----------------")
-    print("1: loging")
-    print("2 : crée un utilisateur")
-    choix_connections = input("Chaoisiser voutre options: ")
-    print("------------------------------------------")
-    if choix_connections == 1:
-        login(gestionnaire)
-    elif choix_connections == 2:
-        crée_utilisateur(gestionnaire)
+    print(menu_1())
+
+
+def menu_1 ():#affichage d'un menue dans le terminal 
+    choix = False
+    while choix == False:
+        print("1: loging")
+        print("2 : crée un utilisateur")
+        choix_connections = int(input("Chaoisiser voutre options: "))
+        print("------------------------------------------")
+        if choix_connections == 1:
+            print(login(gestionnaire))
+            choix = True
+        elif choix_connections == 2:
+            print(crée_utilisateur(gestionnaire))
+            choix = True
+        elif choix_connections != 1 or choix_connections != 2:
+            print("vous dever choisire entre le choix 1 ou 2 !! ")
+
 
 def crée_utilisateur(gestionnaire):
     usr_name = input("entrée votre nom utilisateur : ")
