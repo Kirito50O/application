@@ -1,6 +1,7 @@
 # Pour l'instant ce fichier vat gére la création des utilisateur est les mettre plus tard dans une liste
 # ont def ce que c'est un utilisateur
-from app.fonctionaliter.produit_manager  import * 
+from app.fonctionaliter.produit_manager  import tri_rapide, add_produit
+
 
 class Utilisateur:
 
@@ -22,7 +23,7 @@ class Gestionnaireutilisateur:
 
     def __init__(self):
         self.utilisatuers = {}
-        self.utilisateur_connecte = None 
+        self._utilisateur_connecte = None 
 
             
 
@@ -32,6 +33,7 @@ class Gestionnaireutilisateur:
             print ("Cette utilisateur existe déjà !!")
         else:
             self.utilisatuers[usr_name] = Utilisateur(usr_name, password)
+            self._utilisateur_connecte = self.utilisatuers[usr_name]
             print ("votre compte est crée !!")
 
 
@@ -41,24 +43,25 @@ class Gestionnaireutilisateur:
         if utilisateur is None:
             print( f"Cet utilisateur '{usr_name}' n'existe pas !!")
         elif utilisateur.verifications_password(password):
-            self.utilisateur_connecte = utilisateur
+            self._utilisateur_connecte= utilisateur
             print("Vous êtes connecté")
         else:
             print ("Le mot de passe est incorrect")
+    
+    def log_out(self):
+        self._utilisateur_connecte = None
+        print("utilisateur déconnéctér")
 
-        
+    def utilisateur_connecte(self):
+        return self._utilisateur_connecte
+
+
     def afficher_produits(self):
-        if self.utilisateur_connecte:
-            self.utilisateur_connecte.afficher_produit()
+        if self._utilisateur_connecte:
+            print(f"produit de {self._utilisateur_connecte.usr_name} : {self._utilisateur_connecte.liste_produits}")
         else:
             print("Aucun utilisateur connecté pour afficher une liste.")
 
-    def utilisateur_connecte(self):
-        "Menu quand l'utilisateur et connectée"
-        if not self.utilisateur_connecte:
-            print("Pas d'utilisateur connectée")
-
-        print(f"Bienvenue,{self.utilisateur_connecte.usr_name}!")
     
     def trie_utilisateur(self):
         if self.utilisateur_connecte:
@@ -77,7 +80,7 @@ class Gestionnaireutilisateur:
                 else:
                     print("le choix existe pas")
             if not self.utilisateur_connecte.liste_produits:
-                self.utilisateur_connecte.liste_produits, key = tri_rapide(self.utilisateur_connecte.liste_produits, key)
+                self._utilisateur_connecte.liste_produits, key = tri_rapide(self._utilisateur_connecte.liste_produits, key)
                 print(f'les produit sont trié')
             else:
                 print("votre liste et vide") 

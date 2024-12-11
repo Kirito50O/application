@@ -6,6 +6,7 @@ utilisateur_connecte = gestionnaire.utilisateur_connecte
 
 def main():
     menu_1()
+    menu_principal(gestionnaire)
 
 
 
@@ -26,7 +27,7 @@ def menu_1():  # Affichage d'un menu dans le terminal
             print("Vous devez choisir entre le choix 1 ou 2 !!")
 
 def menu_principal(gestionnaire):
-    if gestionnaire.utilisateur_connecte:
+    if utilisateur_connecte:
         choix = False
         while not choix:
             print("\n=== Menu principal ===")
@@ -43,9 +44,8 @@ def menu_principal(gestionnaire):
             elif choix == 3:
                 gestionnaire.trie_utilisateur()
             elif choix == 4:
-                gestionnaire.utilisateur_connecte = None
+                gestionnaire.log_out()
                 print("Vous êtes déconnecté.")
-                gestionnaire.menu_1()
             else:
                 print("Option invalide. Veuillez réessayer.")
     else:
@@ -60,7 +60,7 @@ def crée_utilisateur(gestionnaire):
 def login(gestionnaire):
     usr_name = input("Entré votre nom d'utilisateur : ")
     password = input("Entrer votre mot de passe : ")
-    utilisateur = gestionnaire.login(usr_name, password)
+    gestionnaire.login(usr_name, password)
 
 if __name__ == "__main__":
     main()

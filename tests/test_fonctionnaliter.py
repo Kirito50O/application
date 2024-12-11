@@ -1,6 +1,7 @@
 #test de la fonctionnaliter de tri avec une liste( est fonctionnelle plus que a modiffe avec les liste utilisateur)
-
-liste = [ 5, 2, 8, 4, 6, 7, 1, 9, 3 ]
+import copy
+liste = [ 1,2,3,8,10,50 ]
+élement_chercher  = 10
 
 def tri_rapide(liste):
     #Ont fait un tri qui vat choisire un pivot est trie par raport à celuis si en mettent dans une liste plus grand ou plus petite. 
@@ -17,6 +18,34 @@ def tri_rapide(liste):
     return liste 
 
 
-sorted_liste = tri_rapide(liste)
+
+
+def searche_binaire(liste, nb_rechercher):
+    debut= liste[0]
+    fin=  len(liste) -1
+    while debut <= fin:
+        millieu = (debut + fin)//2
+        if liste[millieu] == nb_rechercher:
+            return millieu
+        elif liste[millieu] < nb_rechercher:
+            debut = millieu + 1 
+        else:
+           fin = millieu - 1 
+
+def searche_lineaire(liste, nb_recherche):
+    if liste != []:
+        for i in range(1,len(liste)-1):
+            if liste [i] == nb_recherche:
+                return i
+
+def delet_element(élement_chercher, liste):
+    listecopy = copy.deepcopy(liste)
+    tre = searche_lineaire(listecopy, élement_chercher)
+    if tre != 1:
+        liste.pop(tre) 
+    return liste 
+
+sorted_liste = delet_element(élement_chercher ,liste)
+
 
 print(sorted_liste)

@@ -60,3 +60,9 @@ def test():
     gestionnaire.afficher_produits()
 test()
 
+    def utilisateur_connecte(self):
+        "Menu quand l'utilisateur et connectée"
+        if not self.utilisateur_connecte:
+            print("Pas d'utilisateur connectée")
+
+        print(f"Bienvenue,{self.utilisateur_connecte.usr_name}!")
