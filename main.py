@@ -1,26 +1,56 @@
 from app.users.auth import  Gestionnaireutilisateur
 # pour l'instent code qui vat faire l'interaction entre l'utilisateur et les difféerent programe
+
 gestionnaire = Gestionnaireutilisateur()
+utilisateur_connecte = gestionnaire.utilisateur_connecte 
+
 def main():
-    print(menu_1())
+    menu_1()
 
 
-def menu_1 ():#affichage d'un menue dans le terminal 
+
+def menu_1():  # Affichage d'un menu dans le terminal
     choix = False
-    while choix == False:
-        print("1: loging")
-        print("2 : crée un utilisateur")
-        choix_connections = int(input("Chaoisiser voutre options: "))
+    while not choix:
+        print("1: Se connecter")
+        print("2: Créer un utilisateur")
+        choix_connections = int(input("Choisissez votre option : "))
         print("------------------------------------------")
         if choix_connections == 1:
-            print(login(gestionnaire))
+            login(gestionnaire)
             choix = True
         elif choix_connections == 2:
-            print(crée_utilisateur(gestionnaire))
+            crée_utilisateur(gestionnaire)
             choix = True
-        elif choix_connections != 1 or choix_connections != 2:
-            print("vous dever choisire entre le choix 1 ou 2 !! ")
+        else:
+            print("Vous devez choisir entre le choix 1 ou 2 !!")
 
+def menu_principal(gestionnaire):
+    if gestionnaire.utilisateur_connecte:
+        choix = False
+        while not choix:
+            print("\n=== Menu principal ===")
+            print("1: Ajouter un produit")
+            print("2: Afficher les produits")
+            print("3: Trier les produits")
+            print("4: Se déconnecter")
+            choix = int(input("Choisissez votre option : "))
+
+            if choix == 1:
+                gestionnaire.add_produit()
+            elif choix == 2:
+                gestionnaire.afficher_produits()
+            elif choix == 3:
+                gestionnaire.trie_utilisateur()
+            elif choix == 4:
+                gestionnaire.utilisateur_connecte = None
+                print("Vous êtes déconnecté.")
+                gestionnaire.menu_1()
+            else:
+                print("Option invalide. Veuillez réessayer.")
+    else:
+        print("Vous n'êtes pas connecté.")
+        
 
 def crée_utilisateur(gestionnaire):
     usr_name = input("entrée votre nom utilisateur : ")
@@ -34,8 +64,3 @@ def login(gestionnaire):
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
