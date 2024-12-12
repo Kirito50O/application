@@ -10,6 +10,9 @@ class Produit:
         self.name = name 
         self.price = price
         self.quantity = quantity
+    
+    def __repr__(self):
+        return f"Produit : '{self.name}' Prix : '{self.price}' Quantiter : '{self.quantity}'"
 
   
 

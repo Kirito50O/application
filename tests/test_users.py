@@ -60,9 +60,51 @@ def test():
     gestionnaire.afficher_produits()
 test()
 
-    def utilisateur_connecte(self):
-        "Menu quand l'utilisateur et connectée"
-        if not self.utilisateur_connecte:
-            print("Pas d'utilisateur connectée")
+def utilisateur_connecte(self):
+    "Menu quand l'utilisateur et connectée"
+    if not self.utilisateur_connecte:
+        print("Pas d'utilisateur connectée")
 
-        print(f"Bienvenue,{self.utilisateur_connecte.usr_name}!")
+    print(f"Bienvenue,{self.utilisateur_connecte.usr_name}!")
+
+
+
+    def crée_utilisateur(self, usr_name, password):
+        if usr_name in self.utilisatuers:
+            print ("Cette utilisateur existe déjà !!")
+        else:
+            self.utilisatuers[usr_name] = Utilisateur(usr_name, password)
+            self._utilisateur_connecte = self.utilisatuers[usr_name]
+            print ("votre compte est crée !!")
+            return True
+        return None
+
+
+    #option pour ce connectée 
+    def login (self, usr_name, password):
+        utilisateur = self.utilisatuers.get(usr_name)
+        if utilisateur is None:
+            print( f"Cet utilisateur '{usr_name}' n'existe pas !!")
+        elif utilisateur.verifications_password(password):
+            self._utilisateur_connecte= utilisateur
+            print("Vous êtes connecté")
+            return True
+        else:
+            print ("Le mot de passe est incorrect")
+        return None
+
+
+
+
+
+
+
+def crée_utilisateur_main(gestionnaire):
+    usr_name = input("entrée votre nom utilisateur : ")
+    password = input("Entre votre mot de passe : ")
+    return gestionnaire.crée_utilisateur(usr_name, password)
+
+def login_main(gestionnaire):
+    usr_name = input("Entré votre nom d'utilisateur : ")
+    password = input("Entrer votre mot de passe : ")
+    return gestionnaire.login(usr_name, password)
