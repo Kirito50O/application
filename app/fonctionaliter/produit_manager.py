@@ -15,7 +15,8 @@ def tri_rapide(liste, key):
                 liste_plus_petit.append(liste[i])
             else:
                 liste_greadest.append(liste[i])
-        liste = tri_rapide(liste_plus_petit, key)+ [pivot] +tri_rapide(liste_greadest, key)
+        # Appel récursif sur les sous-listes
+        liste = tri_rapide(liste_plus_petit, key) + [pivot] + tri_rapide(liste_greadest, key)
     return liste
 
 def searche_binaire(liste, nb_rechercher):

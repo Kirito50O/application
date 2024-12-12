@@ -2,7 +2,7 @@
 # ont def ce que c'est un utilisateur
 from app.fonctionaliter.produit_manager  import tri_rapide, searche_lineaire, searche_binaire, delet_element
 from app.fonctionaliter.produit import Produit
-
+import os
 
 class Utilisateur:
 
@@ -25,6 +25,49 @@ class Gestionnaireutilisateur:
     def __init__(self):
         self.utilisatuers = {}
         self._utilisateur_connecte = None 
+        self.load_usr()
+        self.load_produit()
+
+
+    def load_usr(self):
+        with open("data/users.txt","r") as file_user : 
+            for line in file_user:
+                usr_name, password = line.strip().split(':')
+                self.utilisatuers[usr_name] = Utilisateur(usr_name, password)
+    
+    def load_produit(self):
+        with open("data/users_produit/users_produit.txt", 'r') as file_produits:
+            current_usr = None
+            for line in file_produits:
+                line.split()
+                if line.endswith(':'):
+                    current_usr = line.rstrip(':') #suprime les (":") pour simplifier le traitement du self.usrname
+                elif current_usr and current_usr in self.utilisatuers: #si il y a l'utilisatuer dans le dictionaire self.utilisateur
+                    name,price,quantity = line.split(',')
+                    produit= Produit(name, int(price), float(quantity)) # Ont crée  les instance de la class Produit
+                    self.utilisateur[current_usr].liste_produits.append(produit) # On met la liste de l'utilisateur dans la liste_produits  
+    
+    def save_usr(self):
+        with open("data/users.txt","w")as file_user :
+            for usr_name, utilisateur in self.utilisatuers.items():
+                file_user.write(f"{usr_name}:{utilisateur.password}\n")
+
+            
+    def save_produit(self):
+        with open("data/users_produit/users_produit.txt","w") as file_produits:
+            for usr_name, utilisateur in self.utilisatuers.items():
+                file_produits.write(f"{usr_name}:\n")
+                for produit in utilisateur.liste_produits:
+                    file_produits.write(f" -{ produit.name}, {produit.price},{produit.quantity}\n")
+
+
+
+
+
+
+
+
+
 
             
 
@@ -37,6 +80,8 @@ class Gestionnaireutilisateur:
         else:
             self.utilisatuers[usr_name] = Utilisateur(usr_name, password)
             self._utilisateur_connecte = self.utilisatuers[usr_name]
+            self.save_usr()
+            self.save_produit()
             print ("votre compte est crée !!")
             return True
         return None
@@ -89,9 +134,9 @@ class Gestionnaireutilisateur:
                     choix = True
                 else:
                     print("le choix existe pas")
-            if self.utilisateur_connecte:
+            if self._utilisateur_connecte.liste_produits:
                 self._utilisateur_connecte.liste_produits, key = tri_rapide(self._utilisateur_connecte.liste_produits, key)
-                print(f'les produit sont trié')
+                print(f"les produit sont trié {self._utilisateur_connecte.liste_produits}")
             else:
                 print("votre liste et vide") 
     
@@ -106,6 +151,7 @@ class Gestionnaireutilisateur:
                 quantity= float(input("Entrée la quantiter : "))
                 produit = Produit(name, price, quantity)
                 self._utilisateur_connecte.liste_produits.append(produit)
+                self.save_produit()
                 print(f"Le Produit '{produit.name}' à étais ajouter avec réusite !")
                 break
         else:
