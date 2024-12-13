@@ -12,12 +12,12 @@ def tri_rapide(liste, key):
         pivot = liste[0]
         for i in range (1 ,len(liste)):
             if getattr(liste[i], key) <= getattr(pivot, key):
-                liste_plus_petit.append(liste[i])
+                liste_plus_petit.append(liste[i], key)
             else:
-                liste_greadest.append(liste[i])
+                liste_greadest.append(liste[i],key)
         # Appel récursif sur les sous-listes
         liste = tri_rapide(liste_plus_petit, key) + [pivot] + tri_rapide(liste_greadest, key)
-    return liste
+    return listeq
 
 def searche_binaire(liste, nb_rechercher):
      # S'assurer que la liste est triée par nom

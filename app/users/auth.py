@@ -36,15 +36,15 @@ class Gestionnaireutilisateur:
                 self.utilisatuers[usr_name] = Utilisateur(usr_name, password)
     
     def load_produit(self):
-        with open("data/users_produit/users_produit.txt", 'r') as file_produits:
+        with open("data/users_produit.txt", "r") as file_produits:
             current_usr = None
             for line in file_produits:
                 line.strip()
-                if not line:  # Ignore les lignes vides
-                    continue
-                if line.endswith(':\n'):
-                    current_usr = line.rstrip(':') #suprime les (":") pour simplifier le traitement du self.usrname
-                elif current_usr and current_usr in self.utilisatuers: #si il y a l'utilisatuer dans le dictionaire self.utilisateur
+                print(f"current_usr = {current_usr}") 
+                if line.endswith(':'):
+                    current_usr = line.rstrip(':')
+                    print(f"current_usr = {current_usr}") #suprime les (":") pour simplifier le traitement du self.usrname
+                if current_usr and current_usr in self.utilisatuers: #si il y a l'utilisatuer dans le dictionaire self.utilisateur
                     name,price,quantity = line.split(',')
                     produit= Produit(name, int(price), float(quantity)) # Ont crée  les instance de la class Produit
                     print(f"Produit ajouté pour {current_usr}: {produit.name}, {produit.price}, {produit.quantity}")
@@ -60,11 +60,11 @@ class Gestionnaireutilisateur:
 
             
     def save_produit(self):
-        with open("data/users_produit/users_produit.txt","w") as file_produits:
+        with open("data/users_produit.txt","w") as file_produits:
             for usr_name, utilisateur in self.utilisatuers.items():
-                file_produits.write(f"{usr_name}:\n")
+                file_produits.write(f"{usr_name}:")
                 for produit in utilisateur.liste_produits:
-                    file_produits.write(f" -{ produit.name}, {produit.price},{produit.quantity}\n")
+                    file_produits.write(f" -{ produit.name}, {produit.price},{produit.quantity}")
 
 
 
@@ -147,8 +147,8 @@ class Gestionnaireutilisateur:
             choix = False
             while choix == False:
                 name = input("Entre le nom du produits :")
-                price = int(input("Entre le prix:"))
-                quantity= float(input("Entrée la quantiter : "))
+                price = float(input("Entre le prix:"))
+                quantity= int(input("Entrée la quantiter : "))
                 produit = Produit(name, price, quantity)
                 self._utilisateur_connecte.liste_produits.append(produit)
                 self.save_produit()
