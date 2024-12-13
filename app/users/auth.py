@@ -32,39 +32,39 @@ class Gestionnaireutilisateur:
     def load_usr(self):
         with open("data/users.txt","r") as file_user : 
             for line in file_user:
-                usr_name, password = line.strip().split(':')
+                usr_name, password = line.split(":").strip()
                 self.utilisatuers[usr_name] = Utilisateur(usr_name, password)
     
     def load_produit(self):
         with open("data/users_produit.txt", "r") as file_produits:
-            current_usr = None
             for line in file_produits:
                 line.strip()
-                print(f"current_usr = {current_usr}") 
-                if line.endswith(':'):
-                    current_usr = line.rstrip(':')
-                    print(f"current_usr = {current_usr}") #suprime les (":") pour simplifier le traitement du self.usrname
-                if current_usr and current_usr in self.utilisatuers: #si il y a l'utilisatuer dans le dictionaire self.utilisateur
-                    name,price,quantity = line.split(',')
-                    produit= Produit(name, int(price), float(quantity)) # Ont crée  les instance de la class Produit
-                    print(f"Produit ajouté pour {current_usr}: {produit.name}, {produit.price}, {produit.quantity}")
-                    self.utilisatuers[current_usr].liste_produits.append(produit) # On met la liste de l'utilisateur dans la liste_produits  
-                else :
-                    print('void')
-                    
+                utilisateur, produit_str = line.split(":")
+                utilisateur = utilisateur.strip()
+                print(f"ce si est l'utilisateur: {utilisateur}")
+                if utilisateur not in self.utilisatuers: #verreifi si lutilisateur a une liste. 
+                    print(f"Utilisateur {utilisateur} non trouvée")
+                
+                produits = produit_str.split(";")
+
+                for produit_str in produits:
+                    if produit_str.strip():
+                        name, price, quantity = produit_str.split(",")
+                        produit = Produit(name.strip(), float(price.strip()), int(quantity.strip()))
+                        self.utilisatuers[utilisateur].liste_produits.append(produit)
+
     
     def save_usr(self):
-        with open("data/users.txt","w")as file_user :
+        with open("data/users.txt","a")as file_user :
             for usr_name, utilisateur in self.utilisatuers.items():
                 file_user.write(f"{usr_name}:{utilisateur.password}\n")
 
             
     def save_produit(self):
-        with open("data/users_produit.txt","w") as file_produits:
+        with open("data/users_produit.txt","a") as file_produits:
             for usr_name, utilisateur in self.utilisatuers.items():
-                file_produits.write(f"{usr_name}:")
                 for produit in utilisateur.liste_produits:
-                    file_produits.write(f" -{ produit.name}, {produit.price},{produit.quantity}")
+                    file_produits.write(f"{usr_name}: { produit.name}, {produit.price},{produit.quantity}\n ")
 
 
 

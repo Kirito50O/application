@@ -108,3 +108,19 @@ def login_main(gestionnaire):
     usr_name = input("Entré votre nom d'utilisateur : ")
     password = input("Entrer votre mot de passe : ")
     return gestionnaire.login(usr_name, password)
+
+
+
+
+
+""""def save_produit(self):
+    with open("data/users_produit.txt", "w") as file_produits:
+        for usr_name, utilisateur in self.utilisatuers.items():
+            # Crée une chaîne pour les produits, séparés par '; '
+            produits_str = "; ".join(
+                f"{produit.name}, {produit.price}, {produit.quantity}"
+                for produit in utilisateur.liste_produits
+            )
+            # Écrire l'utilisateur et ses produits sur une seule ligne
+            file_produits.write(f"{usr_name}: {produits_str}\n")
+"""

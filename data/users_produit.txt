@@ -1,1 +1,4 @@
-test: -Pomme , 1.2,20
+test: 
+test: pome, 6.0, 8
+test: pome, 6.0, 8
+test2: 
