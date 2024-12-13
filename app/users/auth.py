@@ -13,8 +13,6 @@ class Utilisateur:
         
     
     
-    def afficher_produit(self):
-        print(f"Liste de produit de {self.usr_name} : {self.liste_produits}")
 
     def verifications_password(self, password):
         return self.password == password
@@ -26,8 +24,10 @@ class Gestionnaireutilisateur:
         self.utilisatuers = {}
         self._utilisateur_connecte = None 
         self.load_usr()
-        self.load_produit()
 
+    def utilisateur_connecte(self):
+        return self._utilisateur_connecte
+    
 
     def load_usr(self):
         with open("data/users.txt","r") as file_user : 
@@ -39,13 +39,19 @@ class Gestionnaireutilisateur:
         with open("data/users_produit/users_produit.txt", 'r') as file_produits:
             current_usr = None
             for line in file_produits:
-                line.split()
-                if line.endswith(':'):
+                line.strip()
+                if not line:  # Ignore les lignes vides
+                    continue
+                if line.endswith(':\n'):
                     current_usr = line.rstrip(':') #suprime les (":") pour simplifier le traitement du self.usrname
                 elif current_usr and current_usr in self.utilisatuers: #si il y a l'utilisatuer dans le dictionaire self.utilisateur
                     name,price,quantity = line.split(',')
                     produit= Produit(name, int(price), float(quantity)) # Ont crée  les instance de la class Produit
-                    self.utilisateur[current_usr].liste_produits.append(produit) # On met la liste de l'utilisateur dans la liste_produits  
+                    print(f"Produit ajouté pour {current_usr}: {produit.name}, {produit.price}, {produit.quantity}")
+                    self.utilisatuers[current_usr].liste_produits.append(produit) # On met la liste de l'utilisateur dans la liste_produits  
+                else :
+                    print('void')
+                    
     
     def save_usr(self):
         with open("data/users.txt","w")as file_user :
@@ -59,13 +65,6 @@ class Gestionnaireutilisateur:
                 file_produits.write(f"{usr_name}:\n")
                 for produit in utilisateur.liste_produits:
                     file_produits.write(f" -{ produit.name}, {produit.price},{produit.quantity}\n")
-
-
-
-
-
-
-
 
 
 
@@ -96,23 +95,24 @@ class Gestionnaireutilisateur:
             print( f"Cet utilisateur '{usr_name}' n'existe pas !!")
         elif utilisateur.verifications_password(password):
             self._utilisateur_connecte= utilisateur
-            print("Vous êtes connecté")
+            self.load_produit()
+            print(f"Vous êtes connecté {usr_name}: votre liste de produit actuelle {self._utilisateur_connecte.liste_produits}" )
+            
             return True
         else:
             print ("Le mot de passe est incorrect")
         return None
-
     
     def log_out(self):
         self._utilisateur_connecte = None
         print("utilisateur déconnéctér")
 
-    def utilisateur_connecte(self):
-        return self._utilisateur_connecte
+
 
     #  affiche les different produit
     def afficher_produits(self):
         if self._utilisateur_connecte:
+            self.load_produit()
             print(f"produit de {self._utilisateur_connecte.usr_name} : {self._utilisateur_connecte.liste_produits}")
         else:
             print("Aucun utilisateur connecté pour afficher une liste.")
