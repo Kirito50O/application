@@ -108,3 +108,18 @@ def login_main(gestionnaire):
     usr_name = input("Entré votre nom d'utilisateur : ")
     password = input("Entrer votre mot de passe : ")
     return gestionnaire.login(usr_name, password)
+
+
+
+ def crée_utilisateur(self):
+        usr_name = input("Entrée votre nom d'utilisateur : ")
+        password = input("Entrée votre mots de passe : ")
+        if usr_name in self.utilisatuers:
+            print ("Cette utilisateur existe déjà !!")
+        else:
+            new_usr = Utilisateur(usr_name,password)
+            self.utilisateurs[usr_name] = new_usr
+            self.utilisateur_connecte = new_usr
+            print ("votre compte est crée !!")
+            return True
+        return None
