@@ -33,7 +33,7 @@ class Gestionnaireutilisateur:
     def __init__(self):
         self.utilisatuers = {}
         self._utilisateur_connecte = None 
-
+        self.load_usr()
 
             
 
@@ -42,13 +42,10 @@ class Gestionnaireutilisateur:
         return self._utilisateur_connecte
     
 
-    def laod_usr(self):
-        with open("data/users.csv") as csvfile_user : 
-
-            df = pd.read_csv(csvfile_user)
-            if csvfile_user != None:
-                self.utilisateurs = {
-                    row['username']: Utilisateur(row['usrname'], row['password'])for _, row in df.iterrows()}
+    def load_usr(self):
+        df = pd.read_csv("data/users.csv")
+        self.utilisateurs = {
+            row['usr_name']: Utilisateur(row['usr_name'], row['password'])for _, row in df.iterrows()}
                 
 
 
@@ -71,14 +68,11 @@ class Gestionnaireutilisateur:
 
     
     def save_usr(self):
-        with open("data/usr.csv","w") as csvfile_user: 
-            df_usres = pd.read_csv("data/users.csv")
-            
-            # Ajouter le nouvel utilisateur dans le DataFrame
-            data = [(usr_name, utilisateur.password) for usr_name, utilisateur in self.utilisatuers.items()]
-            df_users = pd.DataFrame(data, columns=["username", "password"])
-            df_usres.to_csv("data/users.csv", index= False)   
-
+        # Ajouter le nouvel utilisateur dans le DataFrame
+        data = [(usr_name, utilisateur.password) for usr_name, utilisateur in self.utilisatuers.items()]
+        df_users = pd.DataFrame(data, columns=["username", "password"])
+        df_users.to_csv("data/users.csv", mode = 'a' ,header= False, index= False)
+        
 
 
     def save_produit(self):
@@ -87,8 +81,8 @@ class Gestionnaireutilisateur:
            for produit_name, produit in utilisateur.liste_produits.items():
                data.append([usr_name, produit.name, produit.price, produit.quantity])
         df_produit= pd.DataFrame(data ,columns =["username" , "produit", "price", "quantity"])
-        df_produit.to_csv("data/users_produits.csv",  index=False)
-                 
+        df_produit.to_csv("data/users_produits.csv",mode = 'a',  index=False)
+
 
     #option pour crée un utilisateur
     def crée_utilisateur(self):
@@ -114,6 +108,7 @@ class Gestionnaireutilisateur:
             print( f"Cet utilisateur '{usr_name}' n'existe pas !!")
         elif utilisateur.verifications_password(password):
             self._utilisateur_connecte= utilisateur
+            self.load_usr()
             print("Vous êtes connecté")
             return True
         else:
@@ -167,6 +162,7 @@ class Gestionnaireutilisateur:
                 quantity= int(input("Entrée la quantiter : "))
                 produit = Produit(name, price, quantity)
                 self._utilisateur_connecte.liste_produits[produit.name] = produit
+                self.save_produit()
                 print(f"Le Produit '{produit.name}' à étais ajouter avec réusite !")
                 break
         else:
