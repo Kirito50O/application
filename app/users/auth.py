@@ -3,6 +3,7 @@
 from app.fonctionaliter.produit_manager  import tri_rapide, searche_lineaire, searche_binaire, delet_element
 from app.fonctionaliter.produit import Produit
 import pandas as pd 
+import hashlib
 
 
 
@@ -11,31 +12,31 @@ class Utilisateur:
     def  __init__(self, usr_name, password):
         self.usr_name = usr_name
         self.password = password
+        self.password_hash = self.hash(password)
         self.liste_produits = {}
         
     def __repr__(self):
         # Cette méthode permet d'afficher l'utilisateur de manière lisible
-        return f"Utilisateur(username={self.usr_name}, password={self.password})"
+        return f"Utilisateur(username={self.usr_name}, password={self.password_hash})"
 
     def add_produit(self, produit):
         self.liste_produits[produit.name] = produit
     
-    def afficher_produit(self):
-        print(f"Liste de produit de {self.usr_name} : {self.liste_produits}")
-
 
     def verifications_password(self, password):
-        return self.password == password
+        return self.password_hash == self.hash(password)
+    
+    def hash(self, password):
+        sha256_hash = hashlib.sha256()
+        sha256_hash.update(password.encode('utf-8'))
+        return sha256_hash.hexdigest()
     
 #class fis qui vat appeller le parent Utisateur pour faire les actions  
 class Gestionnaireutilisateur:
 
     def __init__(self):
         self.utilisatuers = {}
-        self._utilisateur_connecte = None 
-        self.load_usr()
-
-            
+        self._utilisateur_connecte = None
 
 
     def utilisateur_connecte(self):
@@ -44,43 +45,42 @@ class Gestionnaireutilisateur:
 
     def load_usr(self):
         df = pd.read_csv("data/users.csv")
-        self.utilisateurs = {
+        self.utilisatuers = {
             row['usr_name']: Utilisateur(row['usr_name'], row['password'])for _, row in df.iterrows()}
                 
 
 
 
     def load_produit(self):
-        with open("data/users_produit.txt") as file_produits:
-            df_produit = pd.read_csv(file_produits)
-            for _, row in df_produit.iterrows():
-                usrname = row["usrename"]
-                produit_name = row["name"]
-                produit_price = row["price"]
-                produit_quantity = row["quantity"]
-                produit= Produit(produit_name, produit_price, produit_quantity)
-                if usrname in self.utilisateurs:
-                    self.utilisateurs[usrname].add_produit(produit)
-                else:
-                    return f"Utilisateur {usrname} non trouvé, pruduit non ajoutér"
-    
+        df_produit = pd.read_csv("data/users_produits.csv")
+        for _, row in df_produit.iterrows():
+            usr_name = row["usr_name"]
+            produit_name = row["produit"]
+            produit_price = row["price"]
+            produit_quantity = row["quantity"]
+            produit= Produit(produit_name, produit_price, produit_quantity)
+            if usr_name in self.utilisatuers:
+                self.utilisatuers[usr_name].add_produit(produit)
+            else:
+                return f"Utilisateur {usr_name} non trouvé, pruduit non ajoutér"
+
 
 
     
     def save_usr(self):
         # Ajouter le nouvel utilisateur dans le DataFrame
-        data = [(usr_name, utilisateur.password) for usr_name, utilisateur in self.utilisatuers.items()]
-        df_users = pd.DataFrame(data, columns=["username", "password"])
-        df_users.to_csv("data/users.csv", mode = 'a' ,header= False, index= False)
+        data = [(usr_name, utilisateur.password_hash) for usr_name, utilisateur in self.utilisatuers.items()]
+        df_users = pd.DataFrame(data, columns=["usr_name", "password"])
+        df_users.to_csv("data/users.csv", mode = 'a' ,header= True, index= False)
         
 
 
     def save_produit(self):
         data = []
-        for usr_name, utilisateur in self.utilisateurs:
+        for usr_name, utilisateur in self.utilisatuers.items():
            for produit_name, produit in utilisateur.liste_produits.items():
                data.append([usr_name, produit.name, produit.price, produit.quantity])
-        df_produit= pd.DataFrame(data ,columns =["username" , "produit", "price", "quantity"])
+        df_produit= pd.DataFrame(data ,columns =["usr_name" , "produit", "price", "quantity"])
         df_produit.to_csv("data/users_produits.csv",mode = 'a',  index=False)
 
 
@@ -101,14 +101,14 @@ class Gestionnaireutilisateur:
 
     #option pour ce connectée 
     def login (self):
+        self.load_usr()
         usr_name = input("Entrée votre nom d'utilisateur : ")
         password = input("Entrée votre mot de passe : ")
         utilisateur = self.utilisatuers.get(usr_name)
         if utilisateur is None:
             print( f"Cet utilisateur '{usr_name}' n'existe pas !!")
         elif utilisateur.verifications_password(password):
-            self._utilisateur_connecte= utilisateur
-            self.load_usr()
+            self._utilisateur_connecte = utilisateur
             print("Vous êtes connecté")
             return True
         else:
@@ -124,6 +124,7 @@ class Gestionnaireutilisateur:
     #  affiche les different produit
     def afficher_produits(self):
         if self._utilisateur_connecte:
+            self.load_produit()
             print(f"produit de {self._utilisateur_connecte.usr_name} : {self._utilisateur_connecte.liste_produits}")
         else:
             print("Aucun utilisateur connecté pour afficher une liste.")
@@ -167,7 +168,7 @@ class Gestionnaireutilisateur:
                 break
         else:
             print("vous devais vous connecter !!!")
-    
+
     #Permet a l'utilisateur de pouvoir mettre ce que l'utilisateur veut supprimer
     
     def deelet(self):
