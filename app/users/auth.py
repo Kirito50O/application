@@ -11,8 +11,7 @@ class Utilisateur:
 
     def  __init__(self, usr_name, password):
         self.usr_name = usr_name
-        self.password = password
-        self.password_hash = self.hash(password)
+        self.password_hash = password
         self.liste_produits = {}
         
     def __repr__(self):
@@ -24,6 +23,7 @@ class Utilisateur:
     
 
     def verifications_password(self, password):
+        password = password.strip()
         return self.password_hash == self.hash(password)
     
     def hash(self, password):
@@ -49,7 +49,7 @@ class Gestionnaireutilisateur:
             row['usr_name']: Utilisateur(row['usr_name'], row['password'])for _, row in df.iterrows()}
                 
 
-
+    
 
     def load_produit(self):
         df_produit = pd.read_csv("data/users_produits.csv")
@@ -83,14 +83,20 @@ class Gestionnaireutilisateur:
         df_produit= pd.DataFrame(data ,columns =["usr_name" , "produit", "price", "quantity"])
         df_produit.to_csv("data/users_produits.csv",mode = 'a',  index=False)
 
+    def hash(self, password):
+        sha256_hash = hashlib.sha256()
+        sha256_hash.update(password.encode('utf-8'))
+        return sha256_hash.hexdigest()
+    
 
     #option pour crée un utilisateur
     def crée_utilisateur(self):
         usr_name = input("Entrée votre nom d'utilisateur : ")
-        password = input("Entrée votre mots de passe : ")
+        password = input("Entrée votre mots de passe : ").strip()
         if usr_name in self.utilisatuers:
             print ("Cette utilisateur existe déjà !!")
         else:
+            password_hash = self.hash(password)
             self.utilisatuers[usr_name] = Utilisateur(usr_name, password)
             self._utilisateur_connecte = self.utilisatuers[usr_name]
             self.save_usr()
@@ -103,7 +109,7 @@ class Gestionnaireutilisateur:
     def login (self):
         self.load_usr()
         usr_name = input("Entrée votre nom d'utilisateur : ")
-        password = input("Entrée votre mot de passe : ")
+        password = input("Entrée votre mot de passe : ").strip()
         utilisateur = self.utilisatuers.get(usr_name)
         if utilisateur is None:
             print( f"Cet utilisateur '{usr_name}' n'existe pas !!")
