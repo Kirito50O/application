@@ -5,6 +5,7 @@ import copy
 
 #option de tris des produi( pour l'instent non mis car attend la fonction pour ce log)
 
+
 def tri_rapide(liste, key):
     if liste != []:
         liste_plus_petit=[]
@@ -18,6 +19,10 @@ def tri_rapide(liste, key):
         # Appel récursif sur les sous-listes
         liste = tri_rapide(liste_plus_petit, key) + [pivot] + tri_rapide(liste_greadest, key)
     return liste
+
+def tri_rapide(self, produits, key):
+    return dict(sorted(produits.items(), key=lambda item : getattr(item[1], key),reverse =False))
+
 
 def searche_binaire(liste, nb_rechercher):
      # S'assurer que la liste est triée par nom

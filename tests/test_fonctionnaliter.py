@@ -1,7 +1,7 @@
 #test de la fonctionnaliter de tri avec une liste( est fonctionnelle plus que a modiffe avec les liste utilisateur)
 import copy
-liste = [ 1,2,3,8,10,50 ]
-élement_chercher  = 10
+import hashlib
+
 
 def tri_rapide(liste):
     #Ont fait un tri qui vat choisire un pivot est trie par raport à celuis si en mettent dans une liste plus grand ou plus petite. 
@@ -20,7 +20,7 @@ def tri_rapide(liste):
 
 
 
-def searche_binaire(liste, nb_rechercher):
+#def searche_binaire(liste, nb_rechercher):
     debut= liste[0]
     fin=  len(liste) -1
     while debut <= fin:
@@ -32,20 +32,28 @@ def searche_binaire(liste, nb_rechercher):
         else:
            fin = millieu - 1 
 
-def searche_lineaire(liste, nb_recherche):
+#def searche_lineaire(liste, nb_recherche):
     if liste != []:
         for i in range(1,len(liste)-1):
             if liste [i] == nb_recherche:
                 return i
 
-def delet_element(élement_chercher, liste):
+#def delet_element(élement_chercher, liste):
     listecopy = copy.deepcopy(liste)
     tre = searche_lineaire(listecopy, élement_chercher)
     if tre != 1:
         liste.pop(tre) 
     return liste 
 
-sorted_liste = delet_element(élement_chercher ,liste)
+
+password ="test12"
 
 
-print(sorted_liste)
+def hash(password):
+    sha256_hash = hashlib.sha256()
+    sha256_hash.update(password.encode('utf-8'))
+    return sha256_hash.hexdigest()
+
+password_hash = hash(password)
+
+print(f"le mot de passe hasher {password_hash}")
