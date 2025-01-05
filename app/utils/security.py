@@ -5,7 +5,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart 
 
 
-def verifiaction_api(password):
+def verifiaction_api(password,mail):
     sha1_hash = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
     prefix = sha1_hash[:5]  
     suffix = sha1_hash[5:]  
@@ -23,6 +23,7 @@ def verifiaction_api(password):
         if returned_suffix == suffix:
             print(f"Password found! Compromised {count} times.")
             found = True
+            mail_envoie(password, mail)
             return True
     if not found :
         return False
@@ -30,8 +31,8 @@ def verifiaction_api(password):
 def envoyer_notification(destinataire, sujet, message):
     """Envoie un e-mail de notification."""
     # Configuration de l'expéditeur
-    expediteur = ""  
-    mot_de_passe = ""  
+    expediteur = "appproduit@gmail.com"  
+    mot_de_passe = "dlrz joro qufs xwro"  
 
     try:
         # Création de l'objet de l'e-mail
@@ -56,18 +57,18 @@ def envoyer_notification(destinataire, sujet, message):
 
     
 
-def mail_envoie(passowrd , mail):
+def mail_envoie(passowrd,mail):
     sujet = "Alerte de sécurité : Votre mot de passe est compomis"
-        message = (
-            f"Bonjour,\n\n"
-            f"Votre mot de passe a été détecté comme compromis. "
-            f"Nous vous recommandons de le changer immédiatement.\n\n"
-            f"Exemple de Règles pour un Mot de Passe Sûr :\n"
-            f"Longueur minimale : 12 caractères.\n"
-            f"Caractères obligatoires :\n"
-            f"- 1 majuscule.\n"
-            f"- 1 minuscule.\n"
-            f"- 1 chiffre.\n"
-            f"- 1 caractère spécial."
+    message = (
+        f"Bonjour,\n\n"
+        f"Votre mot de passe a été détecté comme compromis. "
+        f"Nous vous recommandons de le changer immédiatement.\n\n"
+        f"Exemple de Règles pour un Mot de Passe Sûr :\n"
+        f"Longueur minimale : 12 caractères.\n"
+        f"Caractères obligatoires :\n"
+        f"- 1 majuscule.\n"
+        f"- 1 minuscule.\n"
+        f"- 1 chiffre.\n"
+        f"- 1 caractère spécial."
         )
-        envoyer_notification(utilisateur_email, sujet, message)
+    envoyer_notification(mail, sujet, message)

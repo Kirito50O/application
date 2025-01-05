@@ -46,7 +46,7 @@ def tri_rapide(liste):
     return liste 
 
 
-password ="test12"
+password ="123"
 
 
 def hash(password):
@@ -57,3 +57,25 @@ def hash(password):
 password_hash = hash(password)
 
 print(f"le mot de passe hasher {password_hash}")
+
+
+"""def login (self):
+    self.load_usr()
+    usr_name = input("Entrée votre nom d'utilisateur : ")
+     password = input("Entrée votre mot de passe : ")
+    mail = input("entrée votre mail : ")
+    password_verifier = verifiaction_api(password,mail)
+    utilisateur = self.utilisatuers.get(usr_name)
+    if utilisateur is None:
+        print( f"Cet utilisateur '{usr_name}' n'existe pas !!")
+        
+    elif utilisateur.verifications_password(password):
+        self._utilisateur_connecte = utilisateur
+        print("Vous êtes connecté")
+        return True
+    elif password_verifier: 
+        print("vous devais changer le mot de passe ")
+        return True
+    else:
+        print ("Le mot de passe est incorrect")
+        return None"""

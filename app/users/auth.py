@@ -11,9 +11,10 @@ import hashlib
 
 class Utilisateur:
 
-    def  __init__(self, usr_name, password):
+    def  __init__(self, usr_name, password, mail):
         self.usr_name = usr_name
         self.password_hash = password
+        self.mail = mail 
         self.liste_produits = {}
         
     def __repr__(self):
@@ -54,7 +55,7 @@ class Gestionnaireutilisateur:
     def load_usr(self):
         df = pd.read_csv("data/users.csv")
         self.utilisatuers = {
-            row['usr_name']: Utilisateur(row['usr_name'], row['password'])for _, row in df.iterrows()}
+            row['usr_name']: Utilisateur(row['usr_name'], row['password'], row['mail'])for _, row in df.iterrows()}
                 
 
     
@@ -77,8 +78,8 @@ class Gestionnaireutilisateur:
     # On sauveguarde l'utilisateur dans le ficher csv utilisateur
     def save_usr(self):
         # Ajouter le nouvel utilisateur dans le DataFrame
-        data = [(usr_name, utilisateur.password_hash) for usr_name, utilisateur in self.utilisatuers.items()]
-        df_users = pd.DataFrame(data, columns=["usr_name", "password"])
+        data = [(usr_name, utilisateur.password_hash, utilisateur.mail) for usr_name, utilisateur in self.utilisatuers.items()]
+        df_users = pd.DataFrame(data, columns=["usr_name", "password","mail"])
         df_users.to_csv("data/users.csv", mode = 'a' ,header=False, index= False)
         
 
@@ -97,15 +98,16 @@ class Gestionnaireutilisateur:
     #option pour crée un utilisateur
     def crée_utilisateur(self):
         usr_name = input("Entrée votre nom d'utilisateur : ")
-        password = input("Entrée votre mots de passe : ").strip()
+        password = input("Entrée votre mots de passe : ")
+        mail = input("Enter mail : ")
         if usr_name in self.utilisatuers:
             print ("Cette utilisateur existe déjà !!")
         else:
-            if verifiaction_api(password):
+            if verifiaction_api(password, mail):
                 print("Votre mot de passe est compormit recommencer")
             else:
                 password = self.hash(password)
-                self.utilisatuers[usr_name] = Utilisateur(usr_name, password)
+                self.utilisatuers[usr_name] = Utilisateur(usr_name, password, mail)
                 self._utilisateur_connecte = self.utilisatuers[usr_name]
                 self.save_usr()
                 print ("votre compte est crée !!")
@@ -117,22 +119,22 @@ class Gestionnaireutilisateur:
     def login (self):
         self.load_usr()
         usr_name = input("Entrée votre nom d'utilisateur : ")
-        password = input("Entrée votre mot de passe : ").strip()
-        password_verifier = verifiaction_api(password)
+        password = input("Entrée votre mot de passe : ")
+        mail = input("entrée votre mail : ")
         utilisateur = self.utilisatuers.get(usr_name)
         if utilisateur is None:
-            print( f"Cet utilisateur '{usr_name}' n'existe pas !!")
-            
-        elif utilisateur.verifications_password(password):
+            print( f"Cet utilisateur '{usr_name}' n'existe pas !!")   
+        if not utilisateur.verifications_password(password):
+            print ("Le mot de passe est incorrect")
+            return None
+        else: 
+            password_verifier = verifiaction_api(password,mail)
+            if password_verifier: 
+                print("vous devais changer le mot de passe ")
             self._utilisateur_connecte = utilisateur
             print("Vous êtes connecté")
-            return True
-        elif password_verifier:
-            print("vous devais changer le mot de passe ")
-            return True
-        else:
-            print ("Le mot de passe est incorrect")
-        return None
+        return True
+
 
     # Option pour ce déconnécté 
     def log_out(self):
@@ -184,6 +186,7 @@ class Gestionnaireutilisateur:
                 self.save_produit()
                 print(f"Le Produit '{produit.name}' à étais ajouter avec réusite !")
                 break
+
         else:
             print("vous devais vous connecter !!!")
 

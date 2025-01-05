@@ -1,4 +1,0 @@
-test: 
-test: pome, 6.0, 8
-test: pome, 6.0, 8
-test2: 
