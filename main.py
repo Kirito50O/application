@@ -1,4 +1,5 @@
 from app.users.auth import  Gestionnaireutilisateur
+from app.interface.entrepassword import fenetre_conection,fenêtre_creation_compte
 # pour l'instent code qui vat faire l'interaction entre l'utilisateur et les difféerent programe
 
 gestionnaire = Gestionnaireutilisateur()
@@ -19,10 +20,10 @@ def menu_1():  # Affichage d'un menu dans le terminal
         choix_connections = int(input("Choisissez votre option : "))
         print("------------------------------------------")
         if choix_connections == 1:
-            if gestionnaire.login() :
+            if fenetre_conection():
                 menu_principal(gestionnaire)
         elif choix_connections == 2:
-            if gestionnaire.crée_utilisateur() :
+            if fenêtre_creation_compte() :
                 menu_principal(gestionnaire)
         elif choix_connections == 3:
             print("fin de programme")

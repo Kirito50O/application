@@ -96,10 +96,8 @@ class Gestionnaireutilisateur:
     
 
     #option pour crée un utilisateur
-    def crée_utilisateur(self):
-        usr_name = input("Entrée votre nom d'utilisateur : ")
-        password = input("Entrée votre mots de passe : ")
-        mail = input("Enter mail : ")
+    def cree_utilisateur(self,usr_name,password,mail):
+        
         if usr_name in self.utilisatuers:
             print ("Cette utilisateur existe déjà !!")
         else:
@@ -116,14 +114,12 @@ class Gestionnaireutilisateur:
 
 
     #option pour ce connectée 
-    def login (self):
+    def login (self, usr_name, password, mail):
         self.load_usr()
-        usr_name = input("Entrée votre nom d'utilisateur : ")
-        password = input("Entrée votre mot de passe : ")
-        mail = input("entrée votre mail : ")
         utilisateur = self.utilisatuers.get(usr_name)
         if utilisateur is None:
-            print( f"Cet utilisateur '{usr_name}' n'existe pas !!")   
+            print( f"Cet utilisateur '{usr_name}' n'existe pas !!") 
+            return None  
         if not utilisateur.verifications_password(password):
             print ("Le mot de passe est incorrect")
             return None
@@ -174,7 +170,7 @@ class Gestionnaireutilisateur:
                 print("votre liste et vide") 
     
     # Permet a l'utilisateur d'entrer ce que il veut ajouter 
-    def add_produit(self):
+    def add_produit(self, name, price, quantity):
         if self.utilisateur_connecte:
             choix = False
             while choix == False:
