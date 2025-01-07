@@ -142,30 +142,19 @@ class Gestionnaireutilisateur:
     def afficher_produits(self):
         if self._utilisateur_connecte:
             self.load_produit()
-            print(f"produit de {self._utilisateur_connecte.usr_name} : {self._utilisateur_connecte.liste_produits}")
+            # Retourner la liste des produits sous forme de dictionnaire
+            return self._utilisateur_connecte.liste_produits
         else:
             print("Aucun utilisateur connecté pour afficher une liste.")
+            return {}
 
     # Opptions de trie
-    def trie_utilisateur(self):
+    def trie_utilisateur(self, key):
         if self.utilisateur_connecte:
-            choix = False
-            while choix == False:
-                print("-------- Option de trie --------- ")
-                print("1: trie par prix ")
-                print("2 : trier par quantiter")
-                choix_tri = int(input("faite votre choix :"))
-                if choix_tri == 1 :
-                    key = "price"
-                    choix = True
-                elif choix_tri == 2 :
-                    key ="quantity"
-                    choix = True
-                else:
-                    print("le choix existe pas")
             if self._utilisateur_connecte.liste_produits:
-                self._utilisateur_connecte.liste_produits, key = tri_rapide(self._utilisateur_connecte.liste_produits, key)
+                produits_triees = tri_rapide(self._utilisateur_connecte.liste_produits, key)
                 print(f"les produit sont trié {self._utilisateur_connecte.liste_produits}")
+                return produits_triees 
             else:
                 print("votre liste et vide") 
     
