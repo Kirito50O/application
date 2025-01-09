@@ -69,9 +69,12 @@ class Gestionnaireutilisateur:
             produit_quantity = row["quantity"]
             produit= Produit(produit_name, produit_price, produit_quantity)
             if usr_name in self.utilisatuers:
-                self.utilisatuers[usr_name].add_produit(produit)
-            else:
-                return f"Utilisateur {usr_name} non trouvé, pruduit non ajoutér"
+                utilisateur = self.utilisatuers[usr_name]
+                if produit_name not in utilisateur.liste_produits:  # On vérifie que le produit n'existe pas déjà
+                    utilisateur.add_produit(produit)
+
+                else:
+                    return f"Utilisateur {usr_name} non trouvé, pruduit non ajoutér"
 
 
 
@@ -85,12 +88,14 @@ class Gestionnaireutilisateur:
 
     # On sauveguarde les produit  dans le ficher csv users_produit
     def save_produit(self):
+        df_existing = pd.read_csv("data/users_produits.csv")
         data = []
         for usr_name, utilisateur in self.utilisatuers.items():
            for produit_name, produit in utilisateur.liste_produits.items():
                data.append([usr_name, produit.name, produit.price, produit.quantity])
         df_produit= pd.DataFrame(data ,columns =["usr_name" , "produit", "price", "quantity"])
-        df_produit.to_csv("data/users_produits.csv",mode = 'a', header=False, index=False)
+        df_merged = pd.concat([df_existing, df_produit]).drop_duplicates(subset=["usr_name", "produit"], keep="last")
+        df_merged.to_csv("data/users_produits.csv", index=False)
 
 
     
@@ -117,11 +122,15 @@ class Gestionnaireutilisateur:
     def login (self, usr_name, password, mail):
         self.load_usr()
         utilisateur = self.utilisatuers.get(usr_name)
+        mail_usr=self.utilisatuers.get(mail)
         if utilisateur is None:
             print( f"Cet utilisateur '{usr_name}' n'existe pas !!") 
             return None  
         if not utilisateur.verifications_password(password):
             print ("Le mot de passe est incorrect")
+            return None
+        if mail_usr is None:
+            print(f"Le mail '{mail_usr}' existe pas")
             return None
         else: 
             password_verifier = verifiaction_api(password,mail)
@@ -150,58 +159,81 @@ class Gestionnaireutilisateur:
 
     # Opptions de trie
     def trie_utilisateur(self, key):
-        if self.utilisateur_connecte:
+        self.load_produit()  # Recharger les produits si nécessaire
+        if self._utilisateur_connecte:
             if self._utilisateur_connecte.liste_produits:
+                print(f"Liste des produits avant tri : {self._utilisateur_connecte.liste_produits}")
+                
+                # Appeler tri_rapide et mettre à jour la liste des produits
                 produits_triees = tri_rapide(self._utilisateur_connecte.liste_produits, key)
-                print(f"les produit sont trié {self._utilisateur_connecte.liste_produits}")
-                return produits_triees 
+                print(f"Produits triés par  : {produits_triees}")
+                return produits_triees
             else:
-                print("votre liste et vide") 
-    
+                print("Votre liste de produits est vide.")
+        else:
+            print("Aucun utilisateur connecté.")
+
     # Permet a l'utilisateur d'entrer ce que il veut ajouter 
     def add_produit(self, name, price, quantity):
         if self.utilisateur_connecte:
-            choix = False
-            while choix == False:
-                name = input("Entre le nom du produits :")
-                price = float(input("Entre le prix:"))
-                quantity= int(input("Entrée la quantiter : "))
+            if name in self._utilisateur_connecte.liste_produits: #vérifi si le produit et pas déja dans le csv 
+            # Si le produit existe on met à jour sa quantité
+                produit = self._utilisateur_connecte.liste_produits[name]
+                produit.quantity += quantity  # rajoute la quantiter au produi si elle est modifier
+                self.save_produit()
+                return f"Le Produit '{produit.name}' à étais ajouter avec réusite !"
+            
+            else:
                 produit = Produit(name, price, quantity)
                 self._utilisateur_connecte.liste_produits[produit.name] = produit
                 self.save_produit()
-                print(f"Le Produit '{produit.name}' à étais ajouter avec réusite !")
-                break
-
+                return f"Le Produit '{produit.name}' à étais ajouter avec réusite !"
         else:
-            print("vous devais vous connecter !!!")
+            return "vous devais vous connecter !!!"
 
-    #Permet a l'utilisateur de pouvoir mettre ce que l'utilisateur veut supprimer
-    def deelet(self):
+
+    #Permet a l'utilisateur de pouvoir rechecher un élement
+    def searche(self, name_produit):
+        self.load_produit()
+        if self._utilisateur_connecte:
+            produits = self._utilisateur_connecte.liste_produits
+            for produit in produits.values():
+                if produit.name.lower() == name_produit.lower():  # Ignorer la casse dans la comparaison
+                    return produit
+            print(f"Produit '{name_produit}' non trouvé.")
+            return None
+        else:
+            print("Aucun utilisateur connecté pour effectuer une recherche.")
+            return None
+
+    """def deelet(self, name_produit):
+        if not self._utilisateur_connecte:
+            print("Veuillez d'abord vous connecter.")
+        else:
+            produit_dealet = self.searche(name_produit)
+            if produit_dealet :
+                del  self._utilisateur_connecte.liste_produits[name_produit]
+                self.save_produit()
+                return f'Le produit : {name_produit} est supprimer'
+            else: 
+                return "le produit est pas trouver"""
+                
+    def deelet(self, name_produit):
         if not self._utilisateur_connecte:
             print("Veuillez d'abord vous connecter.")
             return
+        
+        # Recherche du produit à supprimer
+        produit_a_supprimer = self.searche(name_produit)
+        
+        if produit_a_supprimer:
+            # Supprimer le produit de la liste de l'utilisateur
+            del self._utilisateur_connecte.liste_produits[name_produit]
+            
+            # Sauvegarder à nouveau les produits dans le fichier CSV
+            self.save_produit()
+            
+            return f"Le produit '{name_produit}' a été supprimé avec succès."
         else:
-            nom_produit = input("Entrez le nom du produit à supprimer : ")
-            # Appel de la fonction de suppression
-            self._utilisateur_connecte.liste_produits = delet_element(nom_produit, self._utilisateur_connecte.liste_produits)
-
-    #Permet a l'utilisateur de pouvoir rechecher un élement
-    def searche(self):
-        if not self._utilisateur_connecte:
-            print("vous étes pas connecter")
-        else: 
-            print("1 : recherche linéaire")
-            print("2 : recherche binaire")
-            choix_searche = int(input("Quelle type de recheche vouler vous faire :"))
-            if choix_searche == 1:
-                nom_produit = input("Entrez le nom du produit à rechercher (linéaire) : ")
-                index = searche_lineaire(self._utilisateur_connecte.liste_produits, nom_produit)
-                if index != -1:
-                    print(f"Produit trouvé : {self._utilisateur_connecte.liste_produits[index].name}")
-            elif choix_searche == 2: 
-                nom_produit = input("Entrez le nom du produit à rechercher (binaire) : ")
-                index = searche_binaire(self._utilisateur_connecte.liste_produits, nom_produit)
-                if index != -1:
-                    print(f"Produit trouvé : {self._utilisateur_connecte.liste_produits[index]}")
-                else:
-                    print("Produit non trouvé.")  
+            return f"Le produit '{name_produit}' n'a pas été trouvé."
+            

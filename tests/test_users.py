@@ -123,3 +123,174 @@ def crée_utilisateur(self):
         print ("votre compte est crée !!")
         return True
     return None
+
+
+  def login (self):
+        self.load_usr()
+        usr_name = input("Entrée votre nom d'utilisateur : ")
+        password = input("Entrée votre mot de passe : ")
+        mail = input("entrée votre mail : ")
+        utilisateur = self.utilisatuers.get(usr_name)
+        if utilisateur is None:
+            print( f"Cet utilisateur '{usr_name}' n'existe pas !!")   
+        if not utilisateur.verifications_password(password):
+            print ("Le mot de passe est incorrect")
+            return None
+        else: 
+            password_verifier = verifiaction_api(password,mail)
+            if password_verifier: 
+                print("vous devais changer le mot de passe ")
+            self._utilisateur_connecte = utilisateur
+            print("Vous êtes connecté")
+        return True
+
+
+
+
+
+
+    if gestionnaire.utilisateur_connecte():
+        return True
+    else:
+        return False
+
+
+
+
+
+
+
+
+
+
+
+
+def first_menu():
+    window_first = creation_window()
+
+# Création menu principale 
+def menu_option():
+    window_principal= creation_window("menu", "Bienvenue dans le menue", "1000x720")
+    frame = Frame(window_principal, bg="#c4bec7")
+    frame.pack()
+    #Button selection options
+    Button_ajouter_produit = Button(frame, text="Ajouter un produit", font=("Helvetica", 13),bg='black', fg='#c4bec7',command=menu_add_produit())
+    Button_ajouter_produit.pack(pady=10)
+    Button_print_liste = Button(frame, text="Afficher les produits", font=("Helvetica", 13),bg='black', fg='#c4bec7')
+    Button_print_liste.pack(pady=10)
+    Button_trie = Button(frame, text="Trier les produits", font=("Helvetica", 13),bg='black', fg='#c4bec7',command=menu_trie)
+    Button_trie.pack(pady=10)
+    Button_searche = Button(frame, text="rechercher un Produit", font=("Helvetica", 13),bg='black', fg='#c4bec7',command=menu_searche_dealet_produit(mode='searche'))
+    Button_searche.pack(pady=10)
+    Button_dealet = Button(frame, text="retirer un produit", font=("Helvetica", 13),bg='black', fg='#c4bec7',command=menu_searche_dealet_produit(mode='dealet'))
+    Button_dealet.pack(pady=10)
+    Button_log_out = Button(frame, text="Se déconnecter", font=("Helvetica", 13),bg='black', fg='#c4bec7',command=gestionnaire.log_out())
+    Button_log_out.pack(pady=10)
+
+#menu ajouter produit 
+def menu_add_produit():
+    window_add = creation_window("add", "Ajoutée un Produit", "1000x720")
+    frame = Frame(window_add, bg="#c4bec7")
+    frame.pack()
+
+    label_name = Label(frame, text="Entrez le nom du produit", font=("Helvetica", 13), bg='#c4bec7', fg='black')
+    label_name.pack(pady=20)
+
+    entry_name =  Entry(frame, font=("Helvetica", 15), bg='#c4bec7', fg='black')
+    entry_name.pack()
+
+    label_price = Label(frame, text="Entrez le prix", font=("Helvetica", 13), bg='#c4bec7', fg='black')
+    label_price.pack(pady=20)
+
+    entry_price =Entry(frame, font=("Helvetica", 15), bg='#c4bec7', fg='black')
+    entry_price.pack()
+    label_quantity = Label(frame, text="Entrez la quantiter", font=("Helvetica", 13), bg='#c4bec7', fg='black')
+    label_quantity.pack(pady=20)
+
+    entry_quantity = Entry(frame, font=("Helvetica", 15), bg='#c4bec7', fg='black')
+    entry_quantity.pack()
+
+
+#def menu_afficher ():
+# Menue de trie 
+def menu_trie():
+    window_trie = creation_window("Trie", "Appuier pour trié la liste", "1000x720")
+    frame = Frame(window_trie, bg="#c4bec7")
+    frame.pack()
+
+    buttons_trie = Button(frame, text="Trier Mes produits", font=("Helvetica", 13),bg='black', fg='#c4bec7')
+
+#menu de recherche et de supprétion 
+def menu_searche_dealet_produit(mode='searche'):
+
+    if mode == 'searche':
+        page_titre = "searche"
+        texte_titre = "Rechercher un produit"
+        window_size= "1000x720"
+    elif mode == 'dealet':
+        page_titre = "dealet"
+        texte_titre = "Supprimer un produit"
+        window_size= "1000x720"
+
+    window_searche_dealet= creation_window("searche", "Rechercher un produit","1000x720")
+    frame = Frame(window_searche_dealet, bg="#c4bec7")
+    frame.pack()
+
+    label_produit = Label(frame, text="Entrez le nom du produit", font=("Helvetica", 13), bg='#c4bec7', fg='black')
+    label_produit.pack(pady=20)
+
+    entry_produit = Entry(frame, font=("Helvetica", 15), bg='#c4bec7', fg='black')
+    entry_produit.pack()
+    #def action():
+        
+
+    if gestionnaire.utilisateur_connecte():
+        return True
+    else:
+        return False
+    
+
+  def afficher_produits(self):
+        if self._utilisateur_connecte:
+            self.load_produit()
+            print(f"produit de {self._utilisateur_connecte.usr_name} : {self._utilisateur_connecte.liste_produits}")
+        else:
+            print("Aucun utilisateur connecté pour afficher une liste.")
+
+     def trie_utilisateur(self):
+        if self.utilisateur_connecte:
+            choix = False
+            while choix == False:
+                print("-------- Option de trie --------- ")
+                print("1: trie par prix ")
+                print("2 : trier par quantiter")
+                choix_tri = int(input("faite votre choix :"))
+                if choix_tri == 1 :
+                    key = "price"
+                    choix = True
+                elif choix_tri == 2 :
+                    key ="quantity"
+                    choix = True
+                else:
+                    print("le choix existe pas")
+            if self._utilisateur_connecte.liste_produits:
+                self._utilisateur_connecte.liste_produits, key = tri_rapide(self._utilisateur_connecte.liste_produits, key)
+                print(f"les produit sont trié {self._utilisateur_connecte.liste_produits}")
+            else:
+                print("votre liste et vide") 
+
+    def add_produit(self, name, price, quantity):
+        if self.utilisateur_connecte:
+            choix = False
+            while choix == False:
+                name = input("Entre le nom du produits :")
+                price = float(input("Entre le prix:"))
+                quantity= int(input("Entrée la quantiter : "))
+                produit = Produit(name, price, quantity)
+                self._utilisateur_connecte.liste_produits[produit.name] = produit
+                self.save_produit()
+                print(f"Le Produit '{produit.name}' à étais ajouter avec réusite !")
+                break
+
+        else:
+            print("vous devais vous connecter !!!")

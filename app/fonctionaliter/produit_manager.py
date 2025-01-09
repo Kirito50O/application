@@ -1,12 +1,12 @@
 # programe de fonctionnaliter du site tout ce qui vat étre de toucher au produit qui existe. 
 import copy
-
+from app.fonctionaliter.produit import Produit
 #options d'ajouter un produit (pas encore tester)
 
 #option de tris des produi( pour l'instent non mis car attend la fonction pour ce log)
 
 
-def tri_rapide(liste, key):
+"""def tri_rapide(liste, key):
     if liste != []:
         liste_plus_petit=[]
         liste_greadest=[]
@@ -18,9 +18,9 @@ def tri_rapide(liste, key):
                 liste_greadest.append(liste[i],key)
         # Appel récursif sur les sous-listes
         liste = tri_rapide(liste_plus_petit, key) + [pivot] + tri_rapide(liste_greadest, key)
-    return liste
+    return liste"""
 
-def tri_rapide(self, produits, key):
+def tri_rapide(produits, key):
     return dict(sorted(produits.items(), key=lambda item : getattr(item[1], key),reverse =False))
 
 

@@ -60,7 +60,8 @@ password_hash = hash(password)
 print(f"le mot de passe hasher {password_hash}")
 
 
-"""def login (self):
+"""
+mode = 'w', header=True,def login (self):
     self.load_usr()
     usr_name = input("Entrée votre nom d'utilisateur : ")
      password = input("Entrée votre mot de passe : ")
