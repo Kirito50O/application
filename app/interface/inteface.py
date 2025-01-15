@@ -65,7 +65,7 @@ def window_login_creat_usr(mode='connexion'):
     def action():
         usr_name = label_usr_entry.get()
         password = label_password_entry.get()
-        mail = label_email_entry.get() if mode == "création" else None
+        mail = label_email_entry.get() 
         if mode =='connexion':
             if gestionnaire.login(usr_name, password,mail):
                 label_connection_return= Label(frame, text="Bienvenue", font=("Helvetica", 15), bg='#c4bec7', fg='green')
@@ -128,6 +128,8 @@ def menu_option():
     Button_searche.pack(pady=10)
     Button_dealet = Button(frame, text="retirer un produit", font=("Helvetica", 13),bg='black', fg='#c4bec7',command=window_dealet)
     Button_dealet.pack(pady=10)
+    Button_comand = Button(frame, text="Afficher les states commande", font=("Helvetica", 13),bg='black', fg='#c4bec7',command=graph_comand)
+    Button_comand.pack(pady=10)
 
     def close_log_out():
         gestionnaire.log_out()
@@ -327,3 +329,23 @@ def widow_searche():
 
 def window_dealet():
     return menu_searche_dealet_produit(mode1="dealet")
+
+def graph_comand():
+    window_graph = creation_window("graphique ", "graphique","1000x720")
+    frame = Frame(window_graph, bg="#c4bec7")
+    frame.pack()
+    name, quantites = gestionnaire.count_command()
+
+    fig, ax = plt.subplots()
+    ax.bar(name, quantites, color="#2e43e5")
+    ax.set_title('Diagrame des produit avec la quantiter')
+    ax.set_xlabel('Produis')
+    ax.set_ylabel('Quantiter')
+    canvas = FigureCanvasTkAgg(fig,master=frame)
+    canvas.draw()
+    canvas.get_tk_widget().pack()
+
+    window_graph.mainloop()
+
+
+
