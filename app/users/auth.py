@@ -1,8 +1,10 @@
 # Pour l'instant ce fichier vat gére la création des utilisateur est les mettre plus tard dans une liste
 # ont def ce que c'est un utilisateur
-from app.fonctionaliter.produit_manager  import tri_rapide, searche_lineaire, searche_binaire, delet_element
+from app.fonctionaliter.produit_manager  import tri_rapide
 from app.fonctionaliter.produit import Produit
 from app.utils.security import verifiaction_api
+import re
+import json
 import pandas as pd 
 import hashlib
 
@@ -14,12 +16,12 @@ class Utilisateur:
     def  __init__(self, usr_name, password, mail):
         self.usr_name = usr_name
         self.password_hash = password
-        self.mail = mail 
+        self.mail = mail
         self.liste_produits = {}
         
     def __repr__(self):
         # Cette méthode permet d'afficher l'utilisateur de manière lisible
-        return f"Utilisateur(username={self.usr_name}, password={self.password_hash})"
+        return f"Utilisateur(username={self.usr_name}, password={self.password_hash}, mail={self.mail})"
 
     def add_produit(self, produit):
         self.liste_produits[produit.name] = produit
@@ -28,6 +30,10 @@ class Utilisateur:
     def verifications_password(self, password):
         password = password.strip()
         return self.password_hash == self.hash(password)
+    
+    def validate_email(self,mail):
+        regex = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+        return re.match(regex, mail) is not None
     
     # Ont hash pour le mettre dans la data base.
     def hash(self, password):
@@ -43,6 +49,10 @@ class Gestionnaireutilisateur:
         self.utilisatuers = {}
         self._utilisateur_connecte = None
 
+    def validate_email(self,mail):
+        regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+        return re.match(regex, mail) is not None
+
     def hash(self, password):
         sha256_hash = hashlib.sha256()
         sha256_hash.update(password.encode('utf-8'))
@@ -56,6 +66,7 @@ class Gestionnaireutilisateur:
         df = pd.read_csv("data/users.csv")
         self.utilisatuers = {
             row['usr_name']: Utilisateur(row['usr_name'], row['password'], row['mail'])for _, row in df.iterrows()}
+
                 
 
     
@@ -96,15 +107,14 @@ class Gestionnaireutilisateur:
         df_produit= pd.DataFrame(data ,columns =["usr_name" , "produit", "price", "quantity"])
         df_merged = pd.concat([df_existing, df_produit]).drop_duplicates(subset=["usr_name", "produit"], keep="last")
         df_merged.to_csv("data/users_produits.csv", index=False)
-
-
     
 
     #option pour crée un utilisateur
     def cree_utilisateur(self,usr_name,password,mail):
-        
         if usr_name in self.utilisatuers:
             print ("Cette utilisateur existe déjà !!")
+        elif not self.validate_email(mail):
+            print("il ne s'agie pas d'une adress mail")
         else:
             if verifiaction_api(password, mail):
                 print("Votre mot de passe est compormit recommencer")
@@ -122,17 +132,17 @@ class Gestionnaireutilisateur:
     def login (self, usr_name, password, mail):
         self.load_usr()
         utilisateur = self.utilisatuers.get(usr_name)
-        mail_usr=self.utilisatuers.get(mail)
         if utilisateur is None:
             print( f"Cet utilisateur '{usr_name}' n'existe pas !!") 
-            return None  
-        if not utilisateur.verifications_password(password):
+            return None
+        elif not self.validate_email(mail):
+            return None
+        elif utilisateur.mail != mail:
+            return None
+        elif not utilisateur.verifications_password(password):
             print ("Le mot de passe est incorrect")
             return None
-        if mail_usr is None:
-            print(f"Le mail '{mail_usr}' existe pas")
-            return None
-        else: 
+        else:
             password_verifier = verifiaction_api(password,mail)
             if password_verifier: 
                 print("vous devais changer le mot de passe ")
@@ -206,17 +216,7 @@ class Gestionnaireutilisateur:
             print("Aucun utilisateur connecté pour effectuer une recherche.")
             return None
 
-    """def deelet(self, name_produit):
-        if not self._utilisateur_connecte:
-            print("Veuillez d'abord vous connecter.")
-        else:
-            produit_dealet = self.searche(name_produit)
-            if produit_dealet :
-                del  self._utilisateur_connecte.liste_produits[name_produit]
-                self.save_produit()
-                return f'Le produit : {name_produit} est supprimer'
-            else: 
-                return "le produit est pas trouver"""
+    
                 
     def deelet(self, name_produit):
         if not self._utilisateur_connecte:
@@ -236,4 +236,50 @@ class Gestionnaireutilisateur:
             return f"Le produit '{name_produit}' a été supprimé avec succès."
         else:
             return f"Le produit '{name_produit}' n'a pas été trouvé."
-            
+        
+    def post_json(self):
+        with open ("data/commandes.json","r") as f:
+            data=json.load(f)
+        return data
+        
+    def command(self):
+        if self._utilisateur_connecte: 
+            user_name = self._utilisateur_connecte.usr_name
+            produits_utilisateur = self._utilisateur_connecte.liste_produits
+            json_commende = self.post_json()
+            utilisateur_trouver = next(u for u in json_commende if u["user_name"] == user_name)
+            if not utilisateur_trouver:
+                print("Il n'y a pas de commande pour vous")
+            else:
+                if isinstance(utilisateur_trouver, dict):# verrifi si il s'agie d'un dictionnaire 
+                    produit_commander=utilisateur_trouver.get("produit")
+                    produit_quantity = int(utilisateur_trouver.get("quantity"))
+                    produit_utilisateur = next(p for p in produits_utilisateur.values() if p.name == produit_commander)
+                    if produit_utilisateur:
+                        if produit_utilisateur.quantity >= produit_quantity:
+                            produit_utilisateur.quantity -= produit_quantity
+                            self.save_produit()
+                else:
+                    print("Erreu ce n'ai pas un dictionnaire")
+
+    def count_command(self):
+        json_commende = self.post_json() 
+        user_name =  self._utilisateur_connecte.usr_name
+        comandes_par_produit = {}
+        utilisateur_trouver = next(u for u in json_commende if u["user_name"] == user_name)
+        if utilisateur_trouver:
+            for comande in json_commende:
+                if isinstance(comande, dict):
+                    if comande.get("user_name") == user_name:
+                        produit_name = comande.get("produit")
+                        produit_quantity = int(comande.get("quantity"))
+                        
+                        if produit_name in comandes_par_produit:
+                            comandes_par_produit[produit_name] += produit_quantity
+                        else:
+                            comandes_par_produit[produit_name] = produit_quantity
+            name= list(comandes_par_produit.keys())
+            quantites =list(comandes_par_produit.values())
+            return name, quantites
+        else:
+            return [],[]
